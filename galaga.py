@@ -2,17 +2,22 @@ import pygame
 import sys
 import random
 
-# Constants
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
-SHIP_WIDTH = 64
-SHIP_HEIGHT = 64
-ENEMY_WIDTH = 32
-ENEMY_HEIGHT = 32
+import bullet
+import player
+import enemy
 
-# Colors
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
+
+screen_width = 1000
+screen_height = 800
+ship_width = 64
+ship_height = 64
+enemy_width = 32
+enemy_height = 32
+
+
+# colors
+black = (0, 0, 0)
+white = (255, 255, 255)
 
 # Initialize Pygame
 pygame.init()
@@ -20,23 +25,23 @@ pygame.init()
 
 class GalagaGame:
     def __init__(self):
-        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        self.screen = pygame.display.set_mode((screen_width, screen_height))
         pygame.display.set_caption("Galaga")
         self.clock = pygame.time.Clock()
 
         # Load images
-        self.ship_image = pygame.image.load("images/ship_image.png").convert_alpha()
-        self.enemy_image = pygame.image.load("images/enemy_image.png").convert_alpha()
-
-        self.ship_image = pygame.transform.scale(self.ship_image, (SHIP_WIDTH, SHIP_HEIGHT))
-        self.enemy_image = pygame.transform.scale(self.enemy_image, (ENEMY_WIDTH, ENEMY_HEIGHT))
+        self.ship_image_path = "images/ship_image.png"
+        self.enemy_image_path = "images/enemy_image.png"
+        self.bullet_image_path = "images/ship_image.png"
 
         # Set up game objects
-        self.ship = pygame.Rect(SCREEN_WIDTH // 2 - SHIP_WIDTH // 2, SCREEN_HEIGHT - SHIP_HEIGHT - 10, SHIP_WIDTH, SHIP_HEIGHT)
-        self.enemies = []
-        for i in range(5):
-            enemy = pygame.Rect(random.randint(0, SCREEN_WIDTH - ENEMY_WIDTH), random.randint(50, 200), ENEMY_WIDTH, ENEMY_HEIGHT)
-            self.enemies.append(enemy)
+        self.player = player.Starship()
+        self.enemies = pygame.sprite.Group()
+        self.bullets = pygame.sprite.Group()
+
+        for i in range(10):
+            bugs = enemy.Alien(self.enemy_image_path, random.randint(0, screen_width - enemy_width), random.randint(50, 200))
+            self.enemies.add(bugs)
 
     def handle_events(self):
         for event in pygame.event.get():
@@ -45,31 +50,18 @@ class GalagaGame:
                 sys.exit()
 
     def update_game_logic(self):
-        # Move ship
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT]:
-            self.ship.move_ip(-5, 0)
-        if keys[pygame.K_RIGHT]:
-            self.ship.move_ip(5, 0)
+        self.player.update()
+        self.enemies.update()
+        self.bullets.update()
 
-        # Keep ship inside screen
-        if self.ship.left < 0:
-            self.ship.left = 0
-        if self.ship.right > SCREEN_WIDTH:
-            self.ship.right = SCREEN_WIDTH
-
-        # Move enemies
-        for enemy in self.enemies:
-            enemy.move_ip(0, 1)
-
-        # Remove enemies that go off screen
-        self.enemies = [enemy for enemy in self.enemies if enemy.bottom < SCREEN_HEIGHT]
+        self.enemies = pygame.sprite.Group([enemy for enemy in self.enemies if enemy.rect.bottom < screen_height])
+        self.bullets = pygame.sprite.Group([bullet for bullet in self.bullets if bullet.rect.bottom > 0])
 
     def draw_objects(self):
-        self.screen.fill(BLACK)
-        self.screen.blit(self.ship_image, self.ship)
-        for enemy in self.enemies:
-            self.screen.blit(self.enemy_image, enemy)
+        self.screen.fill(black)
+        self.screen.blit(self.player.image, self.player.rect)
+        self.enemies.draw(self.screen)
+        self.bullets.draw(self.screen)
 
         pygame.display.flip()
 
