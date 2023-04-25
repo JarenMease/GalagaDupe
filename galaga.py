@@ -7,8 +7,8 @@ import player
 import enemy
 
 
-screen_width = 1000
-screen_height = 800
+screen_width = 800
+screen_height = 600
 ship_width = 64
 ship_height = 64
 enemy_width = 32
