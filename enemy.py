@@ -3,7 +3,7 @@ import galaga
 
 
 class Alien(pygame.sprite.Sprite):
-    def __init__(self, image_path, x, y):
+    def __init__(self, x, y):
         super().__init__()
         self.image = pygame.image.load("images/enemy_image.png").convert_alpha()
         self.image = pygame.transform.scale(self.image, (galaga.enemy_width, galaga.enemy_height))

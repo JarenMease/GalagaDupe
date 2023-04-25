@@ -1,6 +1,7 @@
 import galaga
 import pygame
-from bullet import Bullet
+# from bullet import Bullet
+import bullet
 
 
 class Starship(pygame.sprite.Sprite):
@@ -12,21 +13,37 @@ class Starship(pygame.sprite.Sprite):
         self.rect.x = galaga.screen_width // 2 - galaga.ship_width // 2
         self.rect.y = galaga.screen_height - galaga.ship_height - 10
         self.bullets = pygame.sprite.Group()
+        self.speed = 5
+        # self.is_firing = False
 
     def update(self):
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT]:
-            self.rect.move_ip(-5, 0)
-        elif keys[pygame.K_RIGHT]:
-            self.rect.move_ip(5, 0)
-        elif keys[pygame.K_UP]:
+        if keys[pygame.K_LEFT] and self.rect.left > 0:
+            self.rect.move_ip(-self.speed, 0)
+        elif keys[pygame.K_RIGHT] and self.rect.right < galaga.screen_width:
+            self.rect.move_ip(self.speed, 0)
+        elif keys[pygame.K_SPACE]:
             self.fire_bullet()
+        # elif keys[pygame.K_UP]:
+        #     # self.fire_bullet()
+        #     self.is_firing = True
+        # else:
+        #     self.is_firing = False
 
-        if self.rect.left < 0:
-            self.rect.left = 0
-        if self.rect.right > galaga.screen_width:
-            self.rect.right = galaga.screen_width
+        # if self.rect.left < 0:
+        #     self.rect.left = 0
+        # if self.rect.right > galaga.screen_width:
+        #     self.rect.right = galaga.screen_width
+        #
+        # # if self.is_firing:
+        # #     self.fire_bullet()
+        #
+        # if keys[pygame.K_UP]:
+        #     self.fire_bullet()
+
+        self.bullets.update()
 
     def fire_bullet(self):
-        new_bullet = Bullet(self.rect.centerx, self.rect.top)
+        print("Firing bullet")
+        new_bullet = bullet.Bullet(self.rect.centerx, self.rect.top)
         self.bullets.add(new_bullet)
