@@ -16,7 +16,9 @@ class Bullet(pygame.sprite.Sprite):
         if self.rect.bottom <= 0:
             self.kill()
 
-    def check_bullet_collision(self, enemy_group):
+    def check_bullet_collision(self, enemy_group, points_score):
         collisions = pygame.sprite.spritecollide(self, enemy_group, True)
         if collisions:
             self.kill()
+            for alien in collisions:
+                points_score.add_points(alien.alien_points)
