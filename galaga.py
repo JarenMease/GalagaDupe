@@ -6,7 +6,6 @@ import enemy
 from enemy import Alien, FastAlien
 import score
 
-# Constants
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 SHIP_WIDTH = 64
@@ -16,7 +15,6 @@ ENEMY_HEIGHT = 32
 FAST_ENEMY_WIDTH = 16
 FAST_ENEMY_HEIGHT = 16
 
-# Colors
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 
@@ -28,17 +26,15 @@ class GalagaGame:
         pygame.display.set_caption("Galaga")
         self.clock = pygame.time.Clock()
 
-        # Load images
         self.ship_image_path = "images/ship_image.png"
         self.enemy_image_path = "images/enemy_image.png"
         self.bullet_image_path = "images/bullet_image.png"
         self.fast_enemy_image_path = "images/fast_enemy.png"
 
-        # Set up game objects
         self.player = player.Starship(self.ship_image_path, self.bullet_image_path)
         self.enemies = pygame.sprite.Group()
         self.bullets = pygame.sprite.Group()
-        self.score_group = pygame.sprite.Group()
+        self.score = score.Scoring()
 
         self.spawn_threshold = 10
         self.second_wave = 15
@@ -51,8 +47,6 @@ class GalagaGame:
         self.game_over = False
         self.user_quit = False
 
-        self.score = score.Scoring()
-
     def handle_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -62,8 +56,8 @@ class GalagaGame:
                 self.reset_game()
 
     def update_game_logic(self):
-        # if self.game_over:
-        #     return
+        if self.game_over:
+            return
 
         self.player.update()
         self.enemies.update()
@@ -115,14 +109,18 @@ class GalagaGame:
                     if event.key == pygame.K_0:
                         self.reset_game()
                         return
+                    elif event.key == pygame.K_ESCAPE:
+                        pygame.quit()
+                        quit()
 
     def reset_game(self):
         self.game_over = False
+        self.user_quit = False
         self.player.reset_player()
         for old_enemy in self.enemies:
-            old_enemy.kill()
+            old_enemy.reset()
         for old_bullet in self.bullets:
-            old_bullet.kill()
+            old_bullet.reset()
         self.score.reset()
         for i in range(50):
             bug = enemy.Alien(self.enemy_image_path, random.randint(0, SCREEN_WIDTH - ENEMY_WIDTH),
@@ -135,8 +133,6 @@ class GalagaGame:
         self.enemies.draw(self.screen)
         self.bullets.draw(self.screen)
         self.score.draw(self.screen)
-        self.score_group.draw(self.screen)
-        self.score.image = self.score.font.render(f"Score: {self.score.score}", True, "WHITE")
         self.screen.blit(self.score.image, self.score.rect)
         pygame.display.flip()
 
