@@ -47,3 +47,5 @@ class Starship(pygame.sprite.Sprite):
         self.rect.y = galaga.SCREEN_HEIGHT - galaga.SHIP_HEIGHT - 10
         self.bullets.empty()
 
+
+        
